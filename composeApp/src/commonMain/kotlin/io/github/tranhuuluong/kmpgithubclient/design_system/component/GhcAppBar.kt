@@ -1,4 +1,4 @@
-package io.github.tranhuuluong.kmpgithubclient
+package io.github.tranhuuluong.kmpgithubclient.design_system.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
+import io.github.tranhuuluong.kmpgithubclient.user.presentation.navigation.Route
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

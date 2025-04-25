@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -37,6 +36,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import io.github.tranhuuluong.kmpgithubclient.design_system.utils.reachedBottom
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -152,9 +152,4 @@ private fun User(
             }
         }
     }
-}
-
-internal fun LazyListState.reachedBottom(): Boolean {
-    val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
-    return lastVisibleItem?.index != 0 && lastVisibleItem?.index == layoutInfo.totalItemsCount - 1
 }

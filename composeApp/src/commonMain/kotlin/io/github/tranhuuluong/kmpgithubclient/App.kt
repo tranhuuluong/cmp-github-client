@@ -16,6 +16,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import io.github.tranhuuluong.kmpgithubclient.design_system.component.GhcAppBar
+import io.github.tranhuuluong.kmpgithubclient.user.presentation.navigation.Route
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_detail.UserDetailRoute
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_list.UserRoute
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -59,10 +61,7 @@ fun App() {
                     composable<Route.UserDetail> { navBackStackEntry ->
                         val args = navBackStackEntry.toRoute<Route.UserDetail>()
                         UserDetailRoute(
-                            userId = args.id,
-                            onBackClick = {
-                                navController.navigateUp()
-                            }
+                            userId = args.id
                         )
                     }
                 }

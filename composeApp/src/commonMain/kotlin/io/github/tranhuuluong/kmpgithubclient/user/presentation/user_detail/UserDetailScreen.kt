@@ -10,12 +10,10 @@ import androidx.compose.ui.Modifier
 @Composable
 internal fun UserDetailRoute(
     userId: String,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     UserDetailScreen(
         userId = userId,
-        onBackClick = onBackClick,
         modifier = modifier
     )
 }
@@ -23,7 +21,6 @@ internal fun UserDetailRoute(
 @Composable
 internal fun UserDetailScreen(
     userId: String,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(

@@ -1,4 +1,4 @@
-package io.github.tranhuuluong.kmpgithubclient
+package io.github.tranhuuluong.kmpgithubclient.user.presentation.navigation
 
 import kotlinx.serialization.Serializable
 
