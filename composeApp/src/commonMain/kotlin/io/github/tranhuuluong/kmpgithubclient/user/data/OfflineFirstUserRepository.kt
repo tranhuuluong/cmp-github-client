@@ -3,6 +3,8 @@ package io.github.tranhuuluong.kmpgithubclient.user.data
 import io.github.tranhuuluong.kmpgithubclient.core.DataStateSuccess
 import io.github.tranhuuluong.kmpgithubclient.core.Result
 import io.github.tranhuuluong.kmpgithubclient.core.StateLoading
+import io.github.tranhuuluong.kmpgithubclient.core.map
+import io.github.tranhuuluong.kmpgithubclient.user.data.remote.UserRemoteDataSource
 import io.github.tranhuuluong.kmpgithubclient.user.domain.UserRepository
 import io.github.tranhuuluong.kmpgithubclient.user.domain.model.User
 import io.github.tranhuuluong.kmpgithubclient.user.domain.model.UserDetail
@@ -12,7 +14,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.time.Duration.Companion.seconds
 
-class OfflineFirstUserRepository : UserRepository {
+class OfflineFirstUserRepository(
+    private val remoteDataSource: UserRemoteDataSource,
+) : UserRepository {
 
     private val fakeUsers = List(20) {
         val userId = "user$it"
@@ -25,12 +29,25 @@ class OfflineFirstUserRepository : UserRepository {
         )
     }
 
-    override fun getUsers(): Flow<Result<List<User>>> {
-        return flow {
-            emit(StateLoading)
-            delay(2.seconds)
-            emit(DataStateSuccess(fakeUsers))
-        }
+    override fun getUsers(): Flow<Result<List<User>>> = flow {
+        emit(StateLoading)
+        emit(
+            remoteDataSource.getUsers(1, 20).map { usersResponse ->
+                usersResponse.map { userDto ->
+                    User(
+                        id = userDto.id.toString(),
+                        name = userDto.login,
+                        profileUrl = userDto.htmlUrl.orEmpty(),
+                        avatarUrl = userDto.avatarUrl.orEmpty(),
+                        type = when (userDto.type) {
+                            "User" -> UserType.User
+                            "Organization" -> UserType.Organization
+                            else -> UserType.Unknown
+                        }
+                    )
+                }
+            }
+        )
     }
 
     override fun getUserDetail(id: String): Flow<Result<UserDetail>> {

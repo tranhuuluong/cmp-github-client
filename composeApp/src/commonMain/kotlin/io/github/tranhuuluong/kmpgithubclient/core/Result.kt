@@ -18,3 +18,10 @@ sealed interface Result<out T> {
         data class Success<T>(val data: T) : DataState<T>
     }
 }
+
+fun <T, R> Result<T>.map(transform: (T) -> R): Result<R> = when (this) {
+    is StateLoading -> StateLoading
+    is StateIdle -> StateIdle
+    is DataStateError -> this
+    is DataStateSuccess -> DataStateSuccess(transform(data))
+}
