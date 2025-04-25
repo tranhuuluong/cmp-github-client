@@ -1,9 +1,18 @@
 package io.github.tranhuuluong.kmpgithubclient
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
@@ -11,34 +20,51 @@ import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_detail.User
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_list.UserRoute
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
         val navController = rememberNavController()
-        NavHost(
-            navController = navController,
-            startDestination = Route.UserGraph,
+        val currentBackStackEntry by navController.currentBackStackEntryAsState()
+        val appBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(appBarScrollBehavior.nestedScrollConnection),
+            topBar = {
+                GhcAppBar(
+                    navBackStackEntry = currentBackStackEntry,
+                    scrollBehavior = appBarScrollBehavior,
+                    onBackButtonClick = { navController.navigateUp() },
+                )
+            }
         ) {
-            navigation<Route.UserGraph>(
-                startDestination = Route.UserListing
+            NavHost(
+                modifier = Modifier.padding(it),
+                navController = navController,
+                startDestination = Route.UserGraph,
             ) {
-                composable<Route.UserListing> {
-                    UserRoute(
-                        onUserClick = {
-                            navController.navigate(Route.UserDetail(id = "userId"))
-                        }
-                    )
-                }
+                navigation<Route.UserGraph>(
+                    startDestination = Route.UserListing
+                ) {
+                    composable<Route.UserListing> {
+                        UserRoute(
+                            onUserClick = { user ->
+                                navController.navigate(Route.UserDetail(id = user.id))
+                            }
+                        )
+                    }
 
-                composable<Route.UserDetail> { navBackStackEntry ->
-                    val args = navBackStackEntry.toRoute<Route.UserDetail>()
-                    UserDetailRoute(
-                        userId = args.id,
-                        onBackClick = {
-                            navController.navigateUp()
-                        }
-                    )
+                    composable<Route.UserDetail> { navBackStackEntry ->
+                        val args = navBackStackEntry.toRoute<Route.UserDetail>()
+                        UserDetailRoute(
+                            userId = args.id,
+                            onBackClick = {
+                                navController.navigateUp()
+                            }
+                        )
+                    }
                 }
             }
         }
