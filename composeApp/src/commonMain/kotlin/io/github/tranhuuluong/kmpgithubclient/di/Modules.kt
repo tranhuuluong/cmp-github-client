@@ -9,6 +9,7 @@ import io.github.tranhuuluong.kmpgithubclient.user.data.remote.KtorUserRemoteDat
 import io.github.tranhuuluong.kmpgithubclient.user.data.remote.UserRemoteDataSource
 import io.github.tranhuuluong.kmpgithubclient.user.domain.UserRepository
 import io.github.tranhuuluong.kmpgithubclient.user.domain.use_case.GetUserListUseCase
+import io.github.tranhuuluong.kmpgithubclient.user.domain.use_case.LoadMoreUsersUseCase
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_list.UserListViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
@@ -31,5 +32,6 @@ val sharedModule = module {
             .build()
     }
     factoryOf(::GetUserListUseCase)
+    factoryOf(::LoadMoreUsersUseCase)
     viewModelOf(::UserListViewModel)
 }

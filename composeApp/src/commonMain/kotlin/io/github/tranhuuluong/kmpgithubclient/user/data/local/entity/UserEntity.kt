@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = UserEntity.TABLE_NAME)
 data class UserEntity(
     @PrimaryKey
+    @ColumnInfo(COLUMN_ID)
     val id: Long,
     @ColumnInfo(COLUMN_GITHUB_ID)
     val githubId: String,
@@ -76,6 +77,7 @@ data class UserEntity(
 
     companion object {
         const val TABLE_NAME = "user"
+        const val COLUMN_ID = "id"
         const val COLUMN_GITHUB_ID = "github_id"
         const val NODE_ID = "node_id"
         const val AVATAR_URL = "avatar_url"

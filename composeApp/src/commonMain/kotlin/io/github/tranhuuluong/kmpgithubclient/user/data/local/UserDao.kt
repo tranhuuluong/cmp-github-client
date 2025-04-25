@@ -15,12 +15,15 @@ interface UserDao {
     @Upsert
     suspend fun upsert(user: UserEntity)
 
-    @Query("SELECT * FROM ${UserEntity.TABLE_NAME}")
-    fun getAll(): Flow<List<UserEntity>>
-
-    @Query("SELECT * FROM ${UserEntity.TABLE_NAME} WHERE id = :id")
-    fun getUser(id: String): Flow<UserEntity?>
-
     @Query("SELECT (SELECT COUNT(*) FROM ${UserEntity.TABLE_NAME}) == 0")
     suspend fun isEmpty(): Boolean
+
+    @Query("SELECT MAX(${UserEntity.COLUMN_ID}) FROM ${UserEntity.TABLE_NAME}")
+    suspend fun getLastUsedId(): Long?
+
+    @Query("SELECT * FROM ${UserEntity.TABLE_NAME}")
+    fun getAllUsers(): Flow<List<UserEntity>>
+
+    @Query("SELECT * FROM ${UserEntity.TABLE_NAME} WHERE id = :id")
+    fun getUserById(id: String): Flow<UserEntity?>
 }

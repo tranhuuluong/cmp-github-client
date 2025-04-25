@@ -1,5 +1,6 @@
 package io.github.tranhuuluong.kmpgithubclient.user.data
 
+import io.github.tranhuuluong.kmpgithubclient.core.DataState
 import io.github.tranhuuluong.kmpgithubclient.core.DataStateError
 import io.github.tranhuuluong.kmpgithubclient.core.DataStateSuccess
 import io.github.tranhuuluong.kmpgithubclient.core.Result
@@ -27,22 +28,23 @@ class OfflineFirstUserRepository(
 
     private val userDao = database.userDao()
 
-    override fun getUsers(): Flow<Result<List<User>>> = userDao.getAll()
+    override fun getUsers(): Flow<Result<List<User>>> = userDao.getAllUsers()
         .map<List<UserEntity>, Result<List<User>>> { userEntities ->
             DataStateSuccess(userEntities.map { userEntity -> userEntity.toUser() })
         }
         .onStart {
             emit(StateLoading)
+
             if (userDao.isEmpty()) {
-                when (val response = remoteDataSource.getUsers(1, 20)) {
-                    is DataStateSuccess -> userDao.upsert(response.data.map { it.toUserEntity() })
-                    is DataStateError -> emit(response)
+                val loadUserResult = loadMoreUsers()
+                if (loadUserResult is DataStateError) {
+                    emit(loadUserResult)
                 }
             }
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getUserDetail(id: String): Flow<Result<UserDetail>> = userDao.getUser(id)
+    override fun getUserDetail(id: String): Flow<Result<UserDetail>> = userDao.getUserById(id)
         .transformLatest { userEntity ->
             if (userEntity == null || userEntity.shouldFetchDetail()) {
                 when (val response = remoteDataSource.getUserDetail(id)) {
@@ -53,4 +55,21 @@ class OfflineFirstUserRepository(
                 emit(DataStateSuccess(userEntity.toUserDetail()))
             }
         }
+
+    override suspend fun loadMoreUsers(): DataState<Unit> {
+        val since = userDao.getLastUsedId()?.toInt() ?: START_INDEX
+        return when (val response = remoteDataSource.getUsers(since, DEFAULT_PAGE_SIZE)) {
+            is DataStateSuccess -> {
+                userDao.upsert(response.data.map { it.toUserEntity() })
+                DataStateSuccess(Unit)
+            }
+
+            is DataStateError -> response
+        }
+    }
+
+    companion object {
+        private const val START_INDEX = 1
+        private const val DEFAULT_PAGE_SIZE = 20
+    }
 }
