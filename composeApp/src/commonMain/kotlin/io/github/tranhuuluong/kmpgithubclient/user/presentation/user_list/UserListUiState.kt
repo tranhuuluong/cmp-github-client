@@ -20,7 +20,6 @@ sealed interface LoadMoreUiState {
 
 data class UserUiModel(
     val id: String,
-    val name: String = "",
     val avatarUrl: String = "",
     val profileUrl: String = "",
 )

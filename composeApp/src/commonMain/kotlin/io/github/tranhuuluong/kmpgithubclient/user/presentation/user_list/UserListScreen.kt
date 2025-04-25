@@ -141,7 +141,7 @@ private fun User(
                 verticalArrangement = Arrangement.SpaceEvenly,
             ) {
                 Text(
-                    text = user.name,
+                    text = user.id,
                     style = MaterialTheme.typography.titleLarge
                 )
                 HorizontalDivider()

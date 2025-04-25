@@ -24,6 +24,6 @@ interface UserDao {
     @Query("SELECT * FROM ${UserEntity.TABLE_NAME}")
     fun getAllUsers(): Flow<List<UserEntity>>
 
-    @Query("SELECT * FROM ${UserEntity.TABLE_NAME} WHERE id = :id")
-    fun getUserById(id: String): Flow<UserEntity?>
+    @Query("SELECT * FROM ${UserEntity.TABLE_NAME} WHERE ${UserEntity.COLUMN_GITHUB_ID} = :githubId")
+    fun getUserByGithubId(githubId: String): Flow<UserEntity?>
 }

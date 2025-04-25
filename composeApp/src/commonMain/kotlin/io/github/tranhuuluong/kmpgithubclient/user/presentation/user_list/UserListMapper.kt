@@ -17,7 +17,6 @@ fun List<User>.toUserUiModels(): List<UserUiModel> = map { user -> user.toUserUi
 
 fun User.toUserUiModel(): UserUiModel = UserUiModel(
     id = id,
-    name = name,
     avatarUrl = avatarUrl,
     profileUrl = profileUrl,
 )

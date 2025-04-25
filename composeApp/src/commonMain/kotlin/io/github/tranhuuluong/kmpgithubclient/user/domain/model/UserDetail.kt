@@ -2,6 +2,8 @@ package io.github.tranhuuluong.kmpgithubclient.user.domain.model
 
 data class UserDetail(
     val user: User,
+    val name: String,
+    val email: String,
     val followers: Int,
     val following: Int,
     val publicRepositories: Int,

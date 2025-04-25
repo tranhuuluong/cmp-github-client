@@ -15,7 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import io.github.tranhuuluong.kmpgithubclient.design_system.component.GhcAppBar
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.navigation.Route
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_detail.UserDetailRoute
@@ -58,11 +57,8 @@ fun App() {
                         )
                     }
 
-                    composable<Route.UserDetail> { navBackStackEntry ->
-                        val args = navBackStackEntry.toRoute<Route.UserDetail>()
-                        UserDetailRoute(
-                            userId = args.id
-                        )
+                    composable<Route.UserDetail> {
+                        UserDetailRoute()
                     }
                 }
             }

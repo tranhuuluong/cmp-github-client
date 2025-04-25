@@ -8,5 +8,5 @@ interface UserRemoteDataSource {
 
     suspend fun getUsers(since: Int, perPage: Int): DataState<List<UserDto>>
 
-    suspend fun getUserDetail(id: String): DataState<UserDetailDto>
+    suspend fun getUserDetail(githubId: String): DataState<UserDetailDto>
 }

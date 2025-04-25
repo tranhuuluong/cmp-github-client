@@ -66,8 +66,7 @@ fun UserDetailDto.toUserEntity(): UserEntity = UserEntity(
 )
 
 fun UserEntity.toUser(): User = User(
-    id = id.toString(),
-    name = githubId,
+    id = githubId,
     avatarUrl = avatarUrl.orEmpty(),
     profileUrl = htmlUrl.orEmpty(),
     type = when (type) {
@@ -79,12 +78,14 @@ fun UserEntity.toUser(): User = User(
 
 fun UserEntity.toUserDetail(): UserDetail = UserDetail(
     user = toUser(),
-    followers = 0,
-    following = 0,
-    publicRepositories = 0,
-    publicGists = 0,
-    blog = "",
-    company = "",
-    location = "",
-    createdAt = "",
+    name = name.orEmpty(),
+    email = email.orEmpty(),
+    followers = followers ?: 0,
+    following = following ?: 0,
+    publicRepositories = publicRepos ?: 0,
+    publicGists = publicGists ?: 0,
+    blog = blog.orEmpty(),
+    company = company.orEmpty(),
+    location = location.orEmpty(),
+    createdAt = createdAt.orEmpty(),
 )

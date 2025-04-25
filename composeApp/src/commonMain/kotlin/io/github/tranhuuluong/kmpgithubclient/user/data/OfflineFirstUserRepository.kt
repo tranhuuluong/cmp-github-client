@@ -44,17 +44,18 @@ class OfflineFirstUserRepository(
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getUserDetail(id: String): Flow<Result<UserDetail>> = userDao.getUserById(id)
-        .transformLatest { userEntity ->
-            if (userEntity == null || userEntity.shouldFetchDetail()) {
-                when (val response = remoteDataSource.getUserDetail(id)) {
-                    is DataStateSuccess -> userDao.upsert(response.data.toUserEntity())
-                    is DataStateError -> emit(response)
+    override fun getUserDetail(userId: String): Flow<Result<UserDetail>> =
+        userDao.getUserByGithubId(userId)
+            .transformLatest { userEntity ->
+                if (userEntity == null || userEntity.shouldFetchDetail()) {
+                    when (val response = remoteDataSource.getUserDetail(userId)) {
+                        is DataStateSuccess -> userDao.upsert(response.data.toUserEntity())
+                        is DataStateError -> emit(response)
+                    }
+                } else {
+                    emit(DataStateSuccess(userEntity.toUserDetail()))
                 }
-            } else {
-                emit(DataStateSuccess(userEntity.toUserDetail()))
             }
-        }
 
     override suspend fun loadMoreUsers(): DataState<Unit> {
         val since = userDao.getLastUsedId()?.toInt() ?: START_INDEX

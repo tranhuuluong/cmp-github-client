@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface UserRepository {
     fun getUsers(): Flow<Result<List<User>>>
 
-    fun getUserDetail(id: String): Flow<Result<UserDetail>>
+    fun getUserDetail(userId: String): Flow<Result<UserDetail>>
 
     suspend fun loadMoreUsers(): DataState<Unit>
 }

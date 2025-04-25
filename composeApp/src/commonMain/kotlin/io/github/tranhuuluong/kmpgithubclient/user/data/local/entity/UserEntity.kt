@@ -117,5 +117,5 @@ data class UserEntity(
  * The createdAt field only exists in the user detail endpoint
  */
 fun UserEntity.shouldFetchDetail(): Boolean {
-    return createdAt != null
+    return createdAt == null
 }

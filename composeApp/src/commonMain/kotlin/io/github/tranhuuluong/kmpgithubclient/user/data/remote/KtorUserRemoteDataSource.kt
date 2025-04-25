@@ -21,9 +21,9 @@ class KtorUserRemoteDataSource(
         }
     }
 
-    override suspend fun getUserDetail(id: String): DataState<UserDetailDto> {
+    override suspend fun getUserDetail(githubId: String): DataState<UserDetailDto> {
         return safeCall<UserDetailDto> {
-            httpClient.get("$USERS_BASE_URL/$id")
+            httpClient.get("$USERS_BASE_URL/$githubId")
         }
     }
 
