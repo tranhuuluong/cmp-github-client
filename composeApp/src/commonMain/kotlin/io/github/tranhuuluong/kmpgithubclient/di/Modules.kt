@@ -1,7 +1,10 @@
 package io.github.tranhuuluong.kmpgithubclient.di
 
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import io.github.tranhuuluong.kmpgithubclient.core.HttpClientFactory
 import io.github.tranhuuluong.kmpgithubclient.user.data.OfflineFirstUserRepository
+import io.github.tranhuuluong.kmpgithubclient.user.data.local.DatabaseBuilderFactory
+import io.github.tranhuuluong.kmpgithubclient.user.data.local.GhcDatabase
 import io.github.tranhuuluong.kmpgithubclient.user.data.remote.KtorUserRemoteDataSource
 import io.github.tranhuuluong.kmpgithubclient.user.data.remote.UserRemoteDataSource
 import io.github.tranhuuluong.kmpgithubclient.user.domain.UserRepository
@@ -20,6 +23,13 @@ val sharedModule = module {
     single { HttpClientFactory.create(get()) }
     singleOf(::OfflineFirstUserRepository).bind<UserRepository>()
     singleOf(::KtorUserRemoteDataSource).bind<UserRemoteDataSource>()
+    single<GhcDatabase> {
+        get<DatabaseBuilderFactory>()
+            .create()
+            .fallbackToDestructiveMigration(true)
+            .setDriver(BundledSQLiteDriver())
+            .build()
+    }
     factoryOf(::GetUserListUseCase)
     viewModelOf(::UserListViewModel)
 }

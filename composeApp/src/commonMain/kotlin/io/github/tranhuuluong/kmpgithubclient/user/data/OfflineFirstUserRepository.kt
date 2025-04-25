@@ -1,74 +1,56 @@
 package io.github.tranhuuluong.kmpgithubclient.user.data
 
+import io.github.tranhuuluong.kmpgithubclient.core.DataStateError
 import io.github.tranhuuluong.kmpgithubclient.core.DataStateSuccess
 import io.github.tranhuuluong.kmpgithubclient.core.Result
 import io.github.tranhuuluong.kmpgithubclient.core.StateLoading
-import io.github.tranhuuluong.kmpgithubclient.core.map
+import io.github.tranhuuluong.kmpgithubclient.user.data.local.GhcDatabase
+import io.github.tranhuuluong.kmpgithubclient.user.data.local.entity.UserEntity
+import io.github.tranhuuluong.kmpgithubclient.user.data.local.entity.shouldFetchDetail
+import io.github.tranhuuluong.kmpgithubclient.user.data.mapper.toUser
+import io.github.tranhuuluong.kmpgithubclient.user.data.mapper.toUserDetail
+import io.github.tranhuuluong.kmpgithubclient.user.data.mapper.toUserEntity
 import io.github.tranhuuluong.kmpgithubclient.user.data.remote.UserRemoteDataSource
 import io.github.tranhuuluong.kmpgithubclient.user.domain.UserRepository
 import io.github.tranhuuluong.kmpgithubclient.user.domain.model.User
 import io.github.tranhuuluong.kmpgithubclient.user.domain.model.UserDetail
-import io.github.tranhuuluong.kmpgithubclient.user.domain.model.UserType
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.transformLatest
 
 class OfflineFirstUserRepository(
+    database: GhcDatabase,
     private val remoteDataSource: UserRemoteDataSource,
 ) : UserRepository {
 
-    private val fakeUsers = List(20) {
-        val userId = "user$it"
-        User(
-            id = userId,
-            name = "User $it",
-            profileUrl = "https://github.com/$userId",
-            avatarUrl = "https://avatars.githubusercontent.com/u/$it",
-            type = UserType.entries.random()
-        )
-    }
+    private val userDao = database.userDao()
 
-    override fun getUsers(): Flow<Result<List<User>>> = flow {
-        emit(StateLoading)
-        emit(
-            remoteDataSource.getUsers(1, 20).map { usersResponse ->
-                usersResponse.map { userDto ->
-                    User(
-                        id = userDto.id.toString(),
-                        name = userDto.login,
-                        profileUrl = userDto.htmlUrl.orEmpty(),
-                        avatarUrl = userDto.avatarUrl.orEmpty(),
-                        type = when (userDto.type) {
-                            "User" -> UserType.User
-                            "Organization" -> UserType.Organization
-                            else -> UserType.Unknown
-                        }
-                    )
+    override fun getUsers(): Flow<Result<List<User>>> = userDao.getAll()
+        .map<List<UserEntity>, Result<List<User>>> { userEntities ->
+            DataStateSuccess(userEntities.map { userEntity -> userEntity.toUser() })
+        }
+        .onStart {
+            emit(StateLoading)
+            if (userDao.isEmpty()) {
+                when (val response = remoteDataSource.getUsers(1, 20)) {
+                    is DataStateSuccess -> userDao.upsert(response.data.map { it.toUserEntity() })
+                    is DataStateError -> emit(response)
                 }
             }
-        )
-    }
-
-    override fun getUserDetail(id: String): Flow<Result<UserDetail>> {
-        return flow {
-            emit(StateLoading)
-            delay(2.seconds)
-            emit(
-                DataStateSuccess(
-                    UserDetail(
-                        user = fakeUsers.first { it.id == id },
-                        followers = 0,
-                        following = 0,
-                        publicRepositories = 0,
-                        publicGists = 0,
-                        blog = "",
-                        company = "",
-                        location = "",
-                        createdAt = "",
-                    )
-                )
-            )
         }
-    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun getUserDetail(id: String): Flow<Result<UserDetail>> = userDao.getUser(id)
+        .transformLatest { userEntity ->
+            if (userEntity == null || userEntity.shouldFetchDetail()) {
+                when (val response = remoteDataSource.getUserDetail(id)) {
+                    is DataStateSuccess -> userDao.upsert(response.data.toUserEntity())
+                    is DataStateError -> emit(response)
+                }
+            } else {
+                emit(DataStateSuccess(userEntity.toUserDetail()))
+            }
+        }
 }
