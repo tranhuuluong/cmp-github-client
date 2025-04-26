@@ -10,65 +10,65 @@ data class UserDetailDto(
     @SerialName("login")
     val login: String,
     @SerialName("node_id")
-    val nodeId: String?,
+    val nodeId: String? = null,
     @SerialName("avatar_url")
-    val avatarUrl: String?,
+    val avatarUrl: String? = null,
     @SerialName("gravatar_id")
-    val gravatarId: String?,
+    val gravatarId: String? = null,
     @SerialName("url")
-    val url: String?,
+    val url: String? = null,
     @SerialName("html_url")
-    val htmlUrl: String?,
+    val htmlUrl: String? = null,
     @SerialName("followers_url")
-    val followersUrl: String?,
+    val followersUrl: String? = null,
     @SerialName("following_url")
-    val followingUrl: String?,
+    val followingUrl: String? = null,
     @SerialName("gists_url")
-    val gistsUrl: String?,
+    val gistsUrl: String? = null,
     @SerialName("starred_url")
-    val starredUrl: String?,
+    val starredUrl: String? = null,
     @SerialName("subscriptions_url")
-    val subscriptionsUrl: String?,
+    val subscriptionsUrl: String? = null,
     @SerialName("organizations_url")
-    val organizationsUrl: String?,
+    val organizationsUrl: String? = null,
     @SerialName("repos_url")
-    val reposUrl: String?,
+    val reposUrl: String? = null,
     @SerialName("events_url")
-    val eventsUrl: String?,
+    val eventsUrl: String? = null,
     @SerialName("received_events_url")
-    val receivedEventsUrl: String?,
+    val receivedEventsUrl: String? = null,
     @SerialName("type")
-    val type: String?,
+    val type: String? = null,
     @SerialName("user_view_type")
-    val userViewType: String?,
+    val userViewType: String? = null,
     @SerialName("site_admin")
-    val siteAdmin: Boolean?,
+    val siteAdmin: Boolean? = null,
     @SerialName("name")
-    val name: String?,
+    val name: String? = null,
     @SerialName("company")
-    val company: String?,
+    val company: String? = null,
     @SerialName("blog")
-    val blog: String?,
+    val blog: String? = null,
     @SerialName("location")
-    val location: String?,
+    val location: String? = null,
     @SerialName("email")
-    val email: String?,
+    val email: String? = null,
     @SerialName("hireable")
-    val hireable: Boolean?,
+    val hireable: Boolean? = null,
     @SerialName("bio")
-    val bio: String?,
+    val bio: String? = null,
     @SerialName("twitter_username")
-    val twitterUsername: String?,
+    val twitterUsername: String? = null,
     @SerialName("public_repos")
-    val publicRepos: Int?,
+    val publicRepos: Int? = null,
     @SerialName("public_gists")
-    val publicGists: Int?,
+    val publicGists: Int? = null,
     @SerialName("followers")
-    val followers: Int?,
+    val followers: Int? = null,
     @SerialName("following")
-    val following: Int?,
+    val following: Int? = null,
     @SerialName("created_at")
-    val createdAt: String?,
+    val createdAt: String? = null,
     @SerialName("updated_at")
-    val updatedAt: String?,
+    val updatedAt: String? = null,
 )
