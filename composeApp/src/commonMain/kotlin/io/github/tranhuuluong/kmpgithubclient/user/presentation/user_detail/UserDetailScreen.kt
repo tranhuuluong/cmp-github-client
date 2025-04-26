@@ -1,49 +1,52 @@
 package io.github.tranhuuluong.kmpgithubclient.user.presentation.user_detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import kmpgithubclient.composeapp.generated.resources.Res
+import kmpgithubclient.composeapp.generated.resources.link
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -64,9 +67,7 @@ internal fun UserDetailScreen(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         when (state) {
@@ -74,39 +75,38 @@ internal fun UserDetailScreen(
             is UserDetailUiState.Success -> Column(
                 modifier = modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(CircleShape),
-                    model = ImageRequest.Builder(LocalPlatformContext.current)
-                        .data(state.avatarUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                )
-                Text(
-                    text = state.userName,
-                    style = MaterialTheme.typography.headlineLarge
-                )
-                Text(
-                    modifier = Modifier
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(32.dp)
+                Avatar(avatarUrl = state.avatarUrl)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(text = state.userName)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            painter = painterResource(Res.drawable.link),
+                            contentDescription = null
                         )
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 8.dp
-                        ),
-                    text = state.id,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                        Text(
+                            text = state.profileUrl,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+                val bio = state.bio
+                if (bio.isNotBlank()) {
+                    Text(
+                        text = state.bio,
+                        style = MaterialTheme.typography.labelMedium.copy(Color.Gray)
+                    )
+                }
                 ProfileStats(
                     followers = state.followers,
                     following = state.following,
@@ -114,12 +114,11 @@ internal fun UserDetailScreen(
                     publicRepos = state.publicRepos,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                InfoCard(
+                UserInfoCard(
                     company = state.company,
                     location = state.location,
+                    joinedDate = state.joinedDate,
                     email = state.email,
-                    joinDate = state.joinDate,
-                    modifier = Modifier.fillMaxWidth(),
                 )
                 val blog = state.blog
                 if (blog.isNotBlank()) {
@@ -135,7 +134,6 @@ internal fun UserDetailScreen(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ProfileStats(
     followers: Int,
@@ -144,27 +142,29 @@ private fun ProfileStats(
     publicRepos: Int,
     modifier: Modifier = Modifier,
 ) {
-    FlowRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        maxItemsInEachRow = 2,
+    Row(
+        modifier = modifier.height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         ProfileStatItem(
             number = followers,
             label = "Followers",
             modifier = Modifier.weight(1f)
         )
+        ProfileStatsDivider()
         ProfileStatItem(
             number = following,
             label = "Following",
             modifier = Modifier.weight(1f)
         )
+        ProfileStatsDivider()
         ProfileStatItem(
             number = publicGists,
             label = "Public Gist",
             modifier = Modifier.weight(1f)
         )
+        ProfileStatsDivider()
         ProfileStatItem(
             number = publicRepos,
             label = "Public Repos",
@@ -174,85 +174,98 @@ private fun ProfileStats(
 }
 
 @Composable
+private fun ProfileStatsDivider(
+    modifier: Modifier = Modifier,
+    verticalPadding: Dp = 8.dp,
+) {
+    VerticalDivider(
+        modifier = modifier.padding(vertical = verticalPadding),
+        color = Color.LightGray.copy(alpha = 0.5f)
+    )
+}
+
+@Composable
 private fun ProfileStatItem(
     number: Int,
     label: String,
     modifier: Modifier = Modifier,
-    numberStyle: TextStyle = MaterialTheme.typography.headlineSmall,
-    labelStyle: TextStyle = MaterialTheme.typography.titleLarge
+    numberStyle: TextStyle = MaterialTheme.typography.titleMedium,
+    labelStyle: TextStyle = MaterialTheme.typography.labelSmall.copy(color = Color.Gray)
 ) {
-    OutlinedCard(
+    Text(
         modifier = modifier,
-    ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 8.dp,
-                    vertical = 12.dp,
-                ),
-            textAlign = TextAlign.Center,
-            text = buildAnnotatedString {
-                withStyle(numberStyle.copy(fontWeight = FontWeight.Bold).toSpanStyle()) {
-                    append("$number")
-                }
-                appendLine()
-                withStyle(labelStyle.toSpanStyle()) {
-                    append(label)
-                }
-            },
-            lineHeight = 30.sp,
-        )
-    }
+        textAlign = TextAlign.Center,
+        text = buildAnnotatedString {
+            withStyle(numberStyle.copy(fontWeight = FontWeight.Bold).toSpanStyle()) {
+                append("$number")
+            }
+            appendLine()
+            withStyle(labelStyle.toSpanStyle()) {
+                append(label)
+            }
+        }
+    )
 }
 
 @Composable
-private fun InfoCard(
+fun UserInfoCard(
     company: String,
     location: String,
+    joinedDate: String,
     email: String,
-    joinDate: String,
     modifier: Modifier = Modifier
 ) {
-    OutlinedCard(
-        modifier = modifier,
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = 4.dp
+        ),
+        modifier = modifier
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
         ) {
-            if (company.isNotBlank()) {
-                InfoItem(icon = Icons.Outlined.Home, text = company)
-            }
-            if (location.isNotBlank()) {
-                InfoItem(icon = Icons.Outlined.LocationOn, text = location)
-            }
-            if (email.isNotBlank()) {
-                InfoItem(icon = Icons.Outlined.Email, text = email)
-            }
-            if (joinDate.isNotBlank()) {
-                InfoItem(icon = Icons.Outlined.DateRange, text = joinDate)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                if (company.isNotBlank()) {
+                    InfoRow(label = "Company", value = company)
+                }
+                if (location.isNotBlank()) {
+                    InfoRow(label = "Location", value = location)
+                }
+                if (joinedDate.isNotBlank()) {
+                    InfoRow(label = "Joined", value = joinedDate)
+                }
+                if (email.isNotBlank()) {
+                    InfoRow(label = "Email", value = email)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun InfoItem(
-    icon: ImageVector,
-    text: String,
-    modifier: Modifier = Modifier
+fun InfoRow(
+    label: String,
+    value: String,
 ) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null
+    Column {
+        Text(
+            text = label.uppercase(),
+            style = MaterialTheme.typography.labelMedium.copy(Color.Gray)
         )
-        Text(text)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.Bold,
+        )
     }
 }
 
@@ -263,13 +276,56 @@ private fun Blog(
 ) {
     Column(
         modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
-            text = "Blog",
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.Bold,
-            )
+            text = "Blog".uppercase(),
+            fontWeight = FontWeight.Bold,
         )
-        Text(text = blog)
+        Text(
+            text = blog,
+            style = MaterialTheme.typography.bodyMedium.copy(Color.Gray)
+        )
+    }
+}
+
+@Composable
+private fun Avatar(
+    avatarUrl: String,
+    avatarSize: Dp = 150.dp,
+    radiatingSize: Dp = 50.dp,
+    circleCount: Int = 3,
+    modifier: Modifier = Modifier,
+) {
+    val boxSize = avatarSize + radiatingSize * circleCount
+    Box(
+        modifier = modifier
+            .size(boxSize),
+        contentAlignment = Alignment.Center
+    ) {
+        // Circles - fading effect
+        for (i in 1..circleCount) {
+            Box(
+                modifier = Modifier
+                    .size(avatarSize + (radiatingSize * i))  // Increase size for each circle
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f / i),  // Fading opacity
+                        shape = CircleShape
+                    )
+            )
+        }
+
+        AsyncImage(
+            modifier = Modifier
+                .size(avatarSize)
+                .clip(CircleShape)
+                .border(4.dp, Color.White, CircleShape),
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data(avatarUrl)
+                .crossfade(true)
+                .build(),
+            contentScale = ContentScale.Crop,
+            contentDescription = null,
+        )
     }
 }

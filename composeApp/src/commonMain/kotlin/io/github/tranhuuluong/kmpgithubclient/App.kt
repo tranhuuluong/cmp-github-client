@@ -1,9 +1,10 @@
 package io.github.tranhuuluong.kmpgithubclient
 
+import GhcTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -25,40 +26,44 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    GhcTheme {
         val navController = rememberNavController()
         val currentBackStackEntry by navController.currentBackStackEntryAsState()
-        val appBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-        Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(appBarScrollBehavior.nestedScrollConnection),
-            topBar = {
-                GhcAppBar(
-                    navBackStackEntry = currentBackStackEntry,
-                    scrollBehavior = appBarScrollBehavior,
-                    onBackButtonClick = { navController.navigateUp() },
-                )
-            }
+        val appBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            NavHost(
-                modifier = Modifier.padding(it),
-                navController = navController,
-                startDestination = Route.UserGraph,
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(appBarScrollBehavior.nestedScrollConnection),
+                topBar = {
+                    GhcAppBar(
+                        navBackStackEntry = currentBackStackEntry,
+                        scrollBehavior = appBarScrollBehavior,
+                        onBackButtonClick = { navController.navigateUp() },
+                    )
+                }
             ) {
-                navigation<Route.UserGraph>(
-                    startDestination = Route.UserListing
+                NavHost(
+                    modifier = Modifier.padding(it),
+                    navController = navController,
+                    startDestination = Route.UserGraph,
                 ) {
-                    composable<Route.UserListing> {
-                        UserRoute(
-                            onUserClick = { user ->
-                                navController.navigate(Route.UserDetail(id = user.id))
-                            }
-                        )
-                    }
+                    navigation<Route.UserGraph>(
+                        startDestination = Route.UserListing
+                    ) {
+                        composable<Route.UserListing> {
+                            UserRoute(
+                                onUserClick = { user ->
+                                    navController.navigate(Route.UserDetail(id = user.id))
+                                }
+                            )
+                        }
 
-                    composable<Route.UserDetail> {
-                        UserDetailRoute()
+                        composable<Route.UserDetail> {
+                            UserDetailRoute()
+                        }
                     }
                 }
             }

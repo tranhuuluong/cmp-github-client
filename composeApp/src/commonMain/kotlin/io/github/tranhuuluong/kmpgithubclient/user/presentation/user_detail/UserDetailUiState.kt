@@ -16,8 +16,9 @@ sealed interface UserDetailUiState {
         val publicRepos: Int = 0,
         val company: String = "",
         val location: String = "",
-        val joinDate: String = "",
+        val joinedDate: String = "",
         val email: String = "",
+        val bio: String = "",
         val blog: String = ""
     ) : UserDetailUiState
 }
