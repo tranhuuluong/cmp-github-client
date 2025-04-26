@@ -61,6 +61,11 @@ kotlin {
             implementation(libs.bundles.ktor)
             implementation(libs.bundles.coil)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+        }
         appleMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
