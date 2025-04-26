@@ -15,6 +15,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.navigation.Route
+import kmpgithubclient.composeapp.generated.resources.Res
+import kmpgithubclient.composeapp.generated.resources.user_detail_title
+import kmpgithubclient.composeapp.generated.resources.user_list_title
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,12 +51,13 @@ internal fun GhcAppBar(
     )
 }
 
+@Composable
 private fun NavBackStackEntry?.getTopBarTitle(): String {
     val destination = this?.destination
     return when {
         destination == null -> ""
-        destination.hasRoute<Route.UserListing>() -> "Github Users"
-        destination.hasRoute<Route.UserDetail>() -> "User Detail"
+        destination.hasRoute<Route.UserListing>() -> stringResource(Res.string.user_list_title)
+        destination.hasRoute<Route.UserDetail>() -> stringResource(Res.string.user_detail_title)
         else -> ""
     }
 }

@@ -1,0 +1,13 @@
+<resources>
+    <string name="user_list_title">Github Users</string>
+    <string name="user_detail_title">User Detail</string>
+    <string name="location">Location</string>
+    <string name="joined_date">Joined</string>
+    <string name="email">Email</string>
+    <string name="company">Company</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="public_gists">Public Gists</string>
+    <string name="public_repos">Public Repos</string>
+    <string name="blog">Blog</string>
+</resources>

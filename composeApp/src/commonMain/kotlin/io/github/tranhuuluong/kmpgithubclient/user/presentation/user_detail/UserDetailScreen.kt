@@ -45,8 +45,17 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kmpgithubclient.composeapp.generated.resources.Res
+import kmpgithubclient.composeapp.generated.resources.company
+import kmpgithubclient.composeapp.generated.resources.email
+import kmpgithubclient.composeapp.generated.resources.followers
+import kmpgithubclient.composeapp.generated.resources.following
+import kmpgithubclient.composeapp.generated.resources.joined_date
 import kmpgithubclient.composeapp.generated.resources.link
+import kmpgithubclient.composeapp.generated.resources.location
+import kmpgithubclient.composeapp.generated.resources.public_gists
+import kmpgithubclient.composeapp.generated.resources.public_repos
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -149,25 +158,25 @@ private fun ProfileStats(
     ) {
         ProfileStatItem(
             number = followers,
-            label = "Followers",
+            label = stringResource(Res.string.followers),
             modifier = Modifier.weight(1f)
         )
         ProfileStatsDivider()
         ProfileStatItem(
             number = following,
-            label = "Following",
+            label = stringResource(Res.string.following),
             modifier = Modifier.weight(1f)
         )
         ProfileStatsDivider()
         ProfileStatItem(
             number = publicGists,
-            label = "Public Gist",
+            label = stringResource(Res.string.public_gists),
             modifier = Modifier.weight(1f)
         )
         ProfileStatsDivider()
         ProfileStatItem(
             number = publicRepos,
-            label = "Public Repos",
+            label = stringResource(Res.string.public_repos),
             modifier = Modifier.weight(1f)
         )
     }
@@ -232,16 +241,16 @@ fun UserInfoCard(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 if (company.isNotBlank()) {
-                    InfoRow(label = "Company", value = company)
+                    InfoRow(label = stringResource(Res.string.company), value = company)
                 }
                 if (location.isNotBlank()) {
-                    InfoRow(label = "Location", value = location)
+                    InfoRow(label = stringResource(Res.string.location), value = location)
                 }
                 if (joinedDate.isNotBlank()) {
-                    InfoRow(label = "Joined", value = joinedDate)
+                    InfoRow(label = stringResource(Res.string.joined_date), value = joinedDate)
                 }
                 if (email.isNotBlank()) {
-                    InfoRow(label = "Email", value = email)
+                    InfoRow(label = stringResource(Res.string.email), value = email)
                 }
             }
         }
