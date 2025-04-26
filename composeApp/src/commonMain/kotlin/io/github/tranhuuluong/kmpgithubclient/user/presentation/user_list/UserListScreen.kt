@@ -23,6 +23,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -32,13 +33,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import io.github.tranhuuluong.kmpgithubclient.design_system.component.ErrorView
 import io.github.tranhuuluong.kmpgithubclient.design_system.utils.reachedBottom
+import kmpgithubclient.composeapp.generated.resources.Res
+import kmpgithubclient.composeapp.generated.resources.retry
+import kmpgithubclient.composeapp.generated.resources.some_thing_went_wrong
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -54,6 +65,7 @@ internal fun UserRoute(
         loadMoreState = loadMoreState,
         onUserClick = onUserClick,
         onLoadMore = viewModel::loadMore,
+        onRetryClick = viewModel::retry,
         modifier = modifier
     )
 }
@@ -64,6 +76,7 @@ internal fun UserListScreen(
     loadMoreState: LoadMoreUiState,
     onUserClick: (UserUiModel) -> Unit,
     onLoadMore: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val lazyListState = rememberLazyListState()
@@ -97,13 +110,40 @@ internal fun UserListScreen(
                     User(user, onUserClick)
                 }
 
-                if (loadMoreState is LoadMoreUiState.Loading) {
-                    item {
+                when (loadMoreState) {
+                    is LoadMoreUiState.Loading -> item {
                         CircularProgressIndicator()
                     }
+
+                    is LoadMoreUiState.Error -> item {
+                        TextButton(onClick = onLoadMore) {
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = buildAnnotatedString {
+                                    append(stringResource(Res.string.some_thing_went_wrong))
+                                    appendLine()
+                                    withStyle(
+                                        SpanStyle(
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontWeight = FontWeight.SemiBold,
+                                        )
+                                    ) {
+                                        append(stringResource(Res.string.retry))
+                                    }
+                                },
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    }
+
+                    else -> {}
                 }
             }
 
+            is UserListUiState.Error -> ErrorView(
+                modifier = Modifier.align(Alignment.TopCenter),
+                onRetry = onRetryClick,
+            )
             else -> {}
         }
     }

@@ -44,6 +44,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import io.github.tranhuuluong.kmpgithubclient.design_system.component.ErrorView
 import kmpgithubclient.composeapp.generated.resources.Res
 import kmpgithubclient.composeapp.generated.resources.company
 import kmpgithubclient.composeapp.generated.resources.email
@@ -66,6 +67,7 @@ internal fun UserDetailRoute(
     val userDetailUiState by viewModel.userDetailUiState.collectAsStateWithLifecycle()
     UserDetailScreen(
         state = userDetailUiState,
+        onRetryClick = viewModel::retry,
         modifier = modifier
     )
 }
@@ -74,6 +76,7 @@ internal fun UserDetailRoute(
 internal fun UserDetailScreen(
     state: UserDetailUiState,
     modifier: Modifier = Modifier,
+    onRetryClick: () -> Unit,
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
@@ -138,7 +141,10 @@ internal fun UserDetailScreen(
                 }
             }
 
-            else -> {}
+            is UserDetailUiState.Error -> ErrorView(
+                modifier = Modifier.align(Alignment.TopCenter),
+                onRetry = onRetryClick,
+            )
         }
     }
 }

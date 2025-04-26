@@ -6,7 +6,6 @@ import io.github.tranhuuluong.kmpgithubclient.core.DataStateSuccess
 import io.github.tranhuuluong.kmpgithubclient.core.Result
 import io.github.tranhuuluong.kmpgithubclient.core.StateLoading
 import io.github.tranhuuluong.kmpgithubclient.user.data.local.GhcDatabase
-import io.github.tranhuuluong.kmpgithubclient.user.data.local.entity.UserEntity
 import io.github.tranhuuluong.kmpgithubclient.user.data.local.entity.shouldFetchDetail
 import io.github.tranhuuluong.kmpgithubclient.user.data.mapper.toUser
 import io.github.tranhuuluong.kmpgithubclient.user.data.mapper.toUserDetail
@@ -17,8 +16,9 @@ import io.github.tranhuuluong.kmpgithubclient.user.domain.model.User
 import io.github.tranhuuluong.kmpgithubclient.user.domain.model.UserDetail
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 
 class OfflineFirstUserRepository(
@@ -28,26 +28,30 @@ class OfflineFirstUserRepository(
 
     private val userDao = database.userDao()
 
-    override fun getUsers(): Flow<Result<List<User>>> = userDao.getAllUsers()
-        .map<List<UserEntity>, Result<List<User>>> { userEntities ->
-            DataStateSuccess(userEntities.map { userEntity -> userEntity.toUser() })
-        }
-        .onStart {
-            emit(StateLoading)
+    override fun getUsers(): Flow<Result<List<User>>> = flow {
+        emit(StateLoading)
 
-            if (userDao.isEmpty()) {
-                val loadUserResult = loadMoreUsers()
-                if (loadUserResult is DataStateError) {
-                    emit(loadUserResult)
-                }
+        if (userDao.isEmpty()) {
+            val loadUserResult = loadMoreUsers()
+            if (loadUserResult is DataStateError) {
+                emit(loadUserResult)
+                return@flow
             }
         }
+        emitAll(
+            userDao.getAllUsers().map { userEntities ->
+                DataStateSuccess(userEntities.map { userEntity -> userEntity.toUser() })
+            }
+        )
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getUserDetail(userId: String): Flow<Result<UserDetail>> =
         userDao.getUserByGithubId(userId)
             .transformLatest { userEntity ->
                 if (userEntity == null || userEntity.shouldFetchDetail()) {
+                    emit(StateLoading)
+
                     when (val response = remoteDataSource.getUserDetail(userId)) {
                         is DataStateSuccess -> userDao.upsert(response.data.toUserEntity())
                         is DataStateError -> emit(response)
