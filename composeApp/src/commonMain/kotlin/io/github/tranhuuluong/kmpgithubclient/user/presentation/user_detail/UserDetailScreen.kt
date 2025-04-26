@@ -2,6 +2,7 @@ package io.github.tranhuuluong.kmpgithubclient.user.presentation.user_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import io.github.tranhuuluong.kmpgithubclient.design_system.component.ErrorView
 import kmpgithubclient.composeapp.generated.resources.Res
+import kmpgithubclient.composeapp.generated.resources.blog
 import kmpgithubclient.composeapp.generated.resources.company
 import kmpgithubclient.composeapp.generated.resources.email
 import kmpgithubclient.composeapp.generated.resources.followers
@@ -84,66 +86,89 @@ internal fun UserDetailScreen(
     ) {
         when (state) {
             is UserDetailUiState.Loading -> CircularProgressIndicator()
-            is UserDetailUiState.Success -> Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Avatar(avatarUrl = state.avatarUrl)
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(text = state.userName)
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.link),
-                            contentDescription = null
-                        )
-                        Text(
-                            text = state.profileUrl,
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                }
-                val bio = state.bio
-                if (bio.isNotBlank()) {
-                    Text(
-                        text = state.bio,
-                        style = MaterialTheme.typography.labelMedium.copy(Color.Gray)
-                    )
-                }
-                ProfileStats(
-                    followers = state.followers,
-                    following = state.following,
-                    publicGists = state.publicGists,
-                    publicRepos = state.publicRepos,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                UserInfoCard(
-                    company = state.company,
-                    location = state.location,
-                    joinedDate = state.joinedDate,
-                    email = state.email,
-                )
-                val blog = state.blog
-                if (blog.isNotBlank()) {
-                    Blog(
-                        modifier = Modifier.align(Alignment.Start),
-                        blog = blog,
-                    )
-                }
-            }
-
+            is UserDetailUiState.Success -> UserDetail(state)
             is UserDetailUiState.Error -> ErrorView(
                 modifier = Modifier.align(Alignment.TopCenter),
                 onRetry = onRetryClick,
+            )
+        }
+    }
+}
+
+@Composable
+private fun UserDetail(
+    userDetail: UserDetailUiState.Success,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        RadiatingUserAvatar(avatarUrl = userDetail.avatarUrl)
+        ProfileNameAndLink(
+            userName = userDetail.userName,
+            githubId = userDetail.id,
+            profileUrl = userDetail.profileUrl,
+            // TODO
+            onProfileLinkClick = {}
+        )
+        val bio = userDetail.bio
+        if (bio.isNotBlank()) {
+            Bio(bio)
+        }
+        ProfileStats(
+            followers = userDetail.followers,
+            following = userDetail.following,
+            publicGists = userDetail.publicGists,
+            publicRepos = userDetail.publicRepos,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        UserInfoCard(
+            company = userDetail.company,
+            location = userDetail.location,
+            joinedDate = userDetail.joinedDate,
+            email = userDetail.email,
+        )
+        val blog = userDetail.blog
+        if (blog.isNotBlank()) {
+            Blog(
+                blog = blog,
+                modifier = Modifier.align(Alignment.Start),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfileNameAndLink(
+    userName: String,
+    githubId: String,
+    profileUrl: String,
+    onProfileLinkClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(text = userName.ifBlank { githubId })
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.link),
+                contentDescription = null
+            )
+            Text(
+                modifier = Modifier.clickable(onClick = onProfileLinkClick),
+                text = profileUrl,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
             )
         }
     }
@@ -223,7 +248,7 @@ private fun ProfileStatItem(
 }
 
 @Composable
-fun UserInfoCard(
+private fun UserInfoCard(
     company: String,
     location: String,
     joinedDate: String,
@@ -264,7 +289,7 @@ fun UserInfoCard(
 }
 
 @Composable
-fun InfoRow(
+private fun InfoRow(
     label: String,
     value: String,
 ) {
@@ -285,27 +310,7 @@ fun InfoRow(
 }
 
 @Composable
-private fun Blog(
-    blog: String,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Text(
-            text = "Blog".uppercase(),
-            fontWeight = FontWeight.Bold,
-        )
-        Text(
-            text = blog,
-            style = MaterialTheme.typography.bodyMedium.copy(Color.Gray)
-        )
-    }
-}
-
-@Composable
-private fun Avatar(
+private fun RadiatingUserAvatar(
     avatarUrl: String,
     avatarSize: Dp = 150.dp,
     radiatingSize: Dp = 50.dp,
@@ -341,6 +346,38 @@ private fun Avatar(
                 .build(),
             contentScale = ContentScale.Crop,
             contentDescription = null,
+        )
+    }
+}
+
+@Composable
+private fun Bio(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = MaterialTheme.typography.labelMedium.copy(Color.Gray)
+    )
+}
+
+@Composable
+private fun Blog(
+    blog: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = stringResource(Res.string.blog).uppercase(),
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = blog,
+            style = MaterialTheme.typography.bodyMedium.copy(Color.Gray)
         )
     }
 }

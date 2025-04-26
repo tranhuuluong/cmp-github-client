@@ -79,6 +79,37 @@ internal fun UserListScreen(
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        when (state) {
+            is UserListUiState.Loading -> CircularProgressIndicator()
+            is UserListUiState.Success -> UserList(
+                users = state.users,
+                loadMoreState = loadMoreState,
+                onUserClick = onUserClick,
+                onLoadMore = onLoadMore
+            )
+
+            is UserListUiState.Error -> ErrorView(
+                modifier = Modifier.align(Alignment.TopCenter),
+                onRetry = onRetryClick,
+            )
+            // TODO
+            is UserListUiState.Empty -> {}
+        }
+    }
+}
+
+@Composable
+private fun UserList(
+    users: List<UserUiModel>,
+    loadMoreState: LoadMoreUiState,
+    onUserClick: (UserUiModel) -> Unit,
+    onLoadMore: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val lazyListState = rememberLazyListState()
     val reachedBottom by remember {
         derivedStateOf { lazyListState.reachedBottom() }
@@ -89,62 +120,30 @@ internal fun UserListScreen(
             onLoadMore()
         }
     }
-
-    Box(
+    LazyColumn(
+        state = lazyListState,
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+        contentPadding = PaddingValues(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        when (state) {
-            is UserListUiState.Loading -> CircularProgressIndicator()
-            is UserListUiState.Success -> LazyColumn(
-                state = lazyListState,
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(
-                    items = state.users,
-                    key = { user -> user.id }
-                ) { user ->
-                    User(user, onUserClick)
-                }
+        items(
+            items = users,
+            key = { user -> user.id }
+        ) { user ->
+            User(user, onUserClick)
+        }
 
-                when (loadMoreState) {
-                    is LoadMoreUiState.Loading -> item {
-                        CircularProgressIndicator()
-                    }
-
-                    is LoadMoreUiState.Error -> item {
-                        TextButton(onClick = onLoadMore) {
-                            Text(
-                                textAlign = TextAlign.Center,
-                                text = buildAnnotatedString {
-                                    append(stringResource(Res.string.some_thing_went_wrong))
-                                    appendLine()
-                                    withStyle(
-                                        SpanStyle(
-                                            color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.SemiBold,
-                                        )
-                                    ) {
-                                        append(stringResource(Res.string.retry))
-                                    }
-                                },
-                                color = MaterialTheme.colorScheme.error,
-                            )
-                        }
-                    }
-
-                    else -> {}
-                }
+        when (loadMoreState) {
+            is LoadMoreUiState.Loading -> item {
+                CircularProgressIndicator()
             }
 
-            is UserListUiState.Error -> ErrorView(
-                modifier = Modifier.align(Alignment.TopCenter),
-                onRetry = onRetryClick,
-            )
-            else -> {}
+            is LoadMoreUiState.Error -> item {
+                RetryTextButton(onClick = onLoadMore)
+            }
+
+            is LoadMoreUiState.Idle -> {}
         }
     }
 }
@@ -197,5 +196,33 @@ private fun User(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun RetryTextButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TextButton(
+        modifier = modifier,
+        onClick = onClick
+    ) {
+        Text(
+            textAlign = TextAlign.Center,
+            text = buildAnnotatedString {
+                append(stringResource(Res.string.some_thing_went_wrong))
+                appendLine()
+                withStyle(
+                    SpanStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                ) {
+                    append(stringResource(Res.string.retry))
+                }
+            },
+            color = MaterialTheme.colorScheme.error,
+        )
     }
 }
