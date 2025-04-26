@@ -1,5 +1,6 @@
 package io.github.tranhuuluong.kmpgithubclient.di
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import io.github.tranhuuluong.kmpgithubclient.core.HttpClientFactory
 import io.github.tranhuuluong.kmpgithubclient.core.util.TimeProvider
@@ -19,6 +20,7 @@ import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_list.UserLi
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -42,5 +44,11 @@ val sharedModule = module {
     factoryOf(::LoadMoreUsersUseCase)
     factoryOf(::GetUserDetailUseCase)
     viewModelOf(::UserListViewModel)
-    viewModelOf(::UserDetailViewModel)
+    viewModel { (saveStateHandle: SavedStateHandle) ->
+        UserDetailViewModel(
+            savedStateHandle = saveStateHandle,
+            getUserDetailUseCase = get(),
+            timeProvider = get()
+        )
+    }
 }

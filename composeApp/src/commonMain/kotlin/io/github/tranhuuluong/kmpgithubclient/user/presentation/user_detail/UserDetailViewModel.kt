@@ -21,12 +21,20 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class UserDetailViewModel(
-    savedStateHandle: SavedStateHandle,
+    private val userId: String,
     getUserDetailUseCase: GetUserDetailUseCase,
     timeProvider: TimeProvider,
 ) : ViewModel() {
 
-    private val userId = savedStateHandle.toRoute<Route.UserDetail>().id
+    constructor(
+        savedStateHandle: SavedStateHandle,
+        getUserDetailUseCase: GetUserDetailUseCase,
+        timeProvider: TimeProvider
+    ) : this(
+        userId = savedStateHandle.toRoute<Route.UserDetail>().id,
+        getUserDetailUseCase = getUserDetailUseCase,
+        timeProvider = timeProvider
+    )
 
     private val fetchUserDetailTrigger = Channel<String>()
     val userDetailUiState = merge(flowOf(userId), fetchUserDetailTrigger.receiveAsFlow())
