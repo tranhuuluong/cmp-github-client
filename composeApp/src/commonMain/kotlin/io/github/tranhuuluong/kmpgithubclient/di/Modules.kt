@@ -7,6 +7,7 @@ import io.github.tranhuuluong.kmpgithubclient.core.util.TimeProviderImpl
 import io.github.tranhuuluong.kmpgithubclient.user.data.OfflineFirstUserRepository
 import io.github.tranhuuluong.kmpgithubclient.user.data.local.DatabaseBuilderFactory
 import io.github.tranhuuluong.kmpgithubclient.user.data.local.GhcDatabase
+import io.github.tranhuuluong.kmpgithubclient.user.data.local.UserDao
 import io.github.tranhuuluong.kmpgithubclient.user.data.remote.KtorUserRemoteDataSource
 import io.github.tranhuuluong.kmpgithubclient.user.data.remote.UserRemoteDataSource
 import io.github.tranhuuluong.kmpgithubclient.user.domain.UserRepository
@@ -36,6 +37,7 @@ val sharedModule = module {
             .setDriver(BundledSQLiteDriver())
             .build()
     }
+    single<UserDao> { get<GhcDatabase>().userDao() }
     factoryOf(::GetUserListUseCase)
     factoryOf(::LoadMoreUsersUseCase)
     factoryOf(::GetUserDetailUseCase)

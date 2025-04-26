@@ -5,7 +5,7 @@ import io.github.tranhuuluong.kmpgithubclient.core.DataStateError
 import io.github.tranhuuluong.kmpgithubclient.core.DataStateSuccess
 import io.github.tranhuuluong.kmpgithubclient.core.Result
 import io.github.tranhuuluong.kmpgithubclient.core.StateLoading
-import io.github.tranhuuluong.kmpgithubclient.user.data.local.GhcDatabase
+import io.github.tranhuuluong.kmpgithubclient.user.data.local.UserDao
 import io.github.tranhuuluong.kmpgithubclient.user.data.local.entity.shouldFetchDetail
 import io.github.tranhuuluong.kmpgithubclient.user.data.mapper.toUser
 import io.github.tranhuuluong.kmpgithubclient.user.data.mapper.toUserDetail
@@ -22,11 +22,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 
 class OfflineFirstUserRepository(
-    database: GhcDatabase,
+    private val userDao: UserDao,
     private val remoteDataSource: UserRemoteDataSource,
 ) : UserRepository {
-
-    private val userDao = database.userDao()
 
     override fun getUsers(): Flow<Result<List<User>>> = flow {
         emit(StateLoading)
