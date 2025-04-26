@@ -6,6 +6,7 @@ import io.github.tranhuuluong.kmpgithubclient.user.data.remote.dto.UserDto
 import io.github.tranhuuluong.kmpgithubclient.user.domain.model.User
 import io.github.tranhuuluong.kmpgithubclient.user.domain.model.UserDetail
 import io.github.tranhuuluong.kmpgithubclient.user.domain.model.UserType
+import kotlinx.datetime.Instant
 
 fun UserDto.toUserEntity(): UserEntity = UserEntity(
     id = id,
@@ -61,8 +62,8 @@ fun UserDetailDto.toUserEntity(): UserEntity = UserEntity(
     publicGists = publicGists,
     followers = followers,
     following = following,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
+    createdAt = createdAt?.let { Instant.parse(it) },
+    updatedAt = updatedAt?.let { Instant.parse(it) },
 )
 
 fun UserEntity.toUser(): User = User(
@@ -80,6 +81,7 @@ fun UserEntity.toUserDetail(): UserDetail = UserDetail(
     user = toUser(),
     name = name.orEmpty(),
     email = email.orEmpty(),
+    bio = bio.orEmpty(),
     followers = followers ?: 0,
     following = following ?: 0,
     publicRepositories = publicRepos ?: 0,
@@ -87,5 +89,5 @@ fun UserEntity.toUserDetail(): UserDetail = UserDetail(
     blog = blog.orEmpty(),
     company = company.orEmpty(),
     location = location.orEmpty(),
-    createdAt = createdAt.orEmpty(),
+    createdAt = createdAt ?: Instant.DISTANT_PAST,
 )

@@ -2,6 +2,8 @@ package io.github.tranhuuluong.kmpgithubclient.di
 
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import io.github.tranhuuluong.kmpgithubclient.core.HttpClientFactory
+import io.github.tranhuuluong.kmpgithubclient.core.util.TimeProvider
+import io.github.tranhuuluong.kmpgithubclient.core.util.TimeProviderImpl
 import io.github.tranhuuluong.kmpgithubclient.user.data.OfflineFirstUserRepository
 import io.github.tranhuuluong.kmpgithubclient.user.data.local.DatabaseBuilderFactory
 import io.github.tranhuuluong.kmpgithubclient.user.data.local.GhcDatabase
@@ -26,6 +28,7 @@ val sharedModule = module {
     single { HttpClientFactory.create(get()) }
     singleOf(::OfflineFirstUserRepository).bind<UserRepository>()
     singleOf(::KtorUserRemoteDataSource).bind<UserRemoteDataSource>()
+    singleOf(::TimeProviderImpl).bind<TimeProvider>()
     single<GhcDatabase> {
         get<DatabaseBuilderFactory>()
             .create()

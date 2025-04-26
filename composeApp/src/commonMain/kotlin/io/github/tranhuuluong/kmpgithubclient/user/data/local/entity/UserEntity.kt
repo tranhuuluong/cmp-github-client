@@ -3,6 +3,7 @@ package io.github.tranhuuluong.kmpgithubclient.user.data.local.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.datetime.Instant
 
 @Entity(tableName = UserEntity.TABLE_NAME)
 data class UserEntity(
@@ -70,9 +71,9 @@ data class UserEntity(
     @ColumnInfo(FOLLOWING)
     val following: Int? = null,
     @ColumnInfo(CREATED_AT)
-    val createdAt: String? = null,
+    val createdAt: Instant? = null,
     @ColumnInfo(UPDATED_AT)
-    val updatedAt: String? = null,
+    val updatedAt: Instant? = null,
 ) {
 
     companion object {
