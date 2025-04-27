@@ -13,6 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Displays the app's top app bar with a title and optional navigation icon.
+ *
+ * @param title The title text displayed in the app bar.
+ * @param showNavigationIcon Whether to show the navigation (back) icon.
+ * @param onNavigationClick Callback invoked when the navigation icon is clicked.
+ * @param scrollBehavior Optional scroll behavior for the app bar.
+ * @param modifier Modifier to apply to the app bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun GhcAppBar(

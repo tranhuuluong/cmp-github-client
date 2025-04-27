@@ -26,6 +26,11 @@ class UserDetailViewModel(
     timeProvider: TimeProvider,
 ) : ViewModel() {
 
+    /**
+     * Typically, this would be the primary constructor, since [userId] comes from navigation.
+     * However, due to KMM constraints Android-specific classes like [SavedStateHandle] (packaged under Android's Bundle)
+     * in the common source set for testing), the primary constructor takes [userId] directly to support shared code and tests.
+     */
     constructor(
         savedStateHandle: SavedStateHandle,
         getUserDetailUseCase: GetUserDetailUseCase,

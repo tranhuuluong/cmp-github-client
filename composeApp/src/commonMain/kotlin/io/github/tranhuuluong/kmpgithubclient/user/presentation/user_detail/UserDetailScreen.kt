@@ -41,11 +41,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import io.github.tranhuuluong.kmpgithubclient.design_system.component.ErrorView
+import io.github.tranhuuluong.kmpgithubclient.user.presentation.navigation.Route
 import kmpgithubclient.composeapp.generated.resources.Res
 import kmpgithubclient.composeapp.generated.resources.blog
 import kmpgithubclient.composeapp.generated.resources.company
@@ -61,6 +63,18 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+fun NavController.navigateToUserDetail(userId: String) {
+    navigate(Route.UserDetail(id = userId))
+}
+
+/**
+ * UI implementation for the User Detail screen.
+ *
+ * Note: Due to Compose Multiplatform limitations, previews are not supported in the common module.
+ * The preview for this screen is located in the Android source set:
+ *
+ * Path: composeApp/src/androidMain/kotlin/io/github/tranhuuluong/kmpgithubclient/compose_preview/PreviewUserDetailScreen.kt
+ */
 @Composable
 internal fun UserDetailRoute(
     modifier: Modifier = Modifier,
@@ -113,8 +127,7 @@ private fun UserDetail(
             userName = userDetail.userName,
             githubId = userDetail.id,
             profileUrl = userDetail.profileUrl,
-            // TODO
-            onProfileLinkClick = {}
+            onProfileLinkClick = {} // TODO
         )
         val bio = userDetail.bio
         if (bio.isNotBlank()) {

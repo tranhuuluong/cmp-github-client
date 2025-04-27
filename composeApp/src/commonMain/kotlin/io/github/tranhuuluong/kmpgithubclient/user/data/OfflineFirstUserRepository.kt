@@ -21,11 +21,17 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 
+/**
+ * Repository implementation that prioritizes local data and fetches from remote if needed.
+ */
 class OfflineFirstUserRepository(
     private val userDao: UserDao,
     private val remoteDataSource: UserRemoteDataSource,
 ) : UserRepository {
 
+    /**
+     * Returns a flow of user list results, emitting from local storage or fetching remotely if empty.
+     */
     override fun getUsers(): Flow<Result<List<User>>> = flow {
         emit(StateLoading)
 
@@ -43,6 +49,13 @@ class OfflineFirstUserRepository(
         )
     }
 
+    /**
+     * Returns a flow of detailed user information for the given user ID.
+     * Fetches remotely if data is missing or incomplete in local storage.
+     *
+     * @param userId The GitHub ID of the user.
+     * @return A [Flow] emitting loading, success, or error states containing user details.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getUserDetail(userId: String): Flow<Result<UserDetail>> =
         userDao.getUserByGithubId(userId)
@@ -59,6 +72,11 @@ class OfflineFirstUserRepository(
                 }
             }
 
+    /**
+     * Loads the next page of users from the remote source and updates local storage.
+     *
+     * @return A [DataState] indicating success or error.
+     */
     override suspend fun loadMoreUsers(): DataState<Unit> {
         val since = userDao.getLastUsedId()?.toInt() ?: START_INDEX
         return when (val response = remoteDataSource.getUsers(since, DEFAULT_PAGE_SIZE)) {

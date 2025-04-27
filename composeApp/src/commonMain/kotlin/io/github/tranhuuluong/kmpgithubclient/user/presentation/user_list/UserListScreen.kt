@@ -52,6 +52,14 @@ import kmpgithubclient.composeapp.generated.resources.some_thing_went_wrong
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+/**
+ * UI implementation for the User List screen.
+ *
+ * Note: Due to Compose Multiplatform limitations, previews are not supported in the common module.
+ * The preview for this screen is located in the Android source set:
+ *
+ * Path: composeApp/src/androidMain/kotlin/io/github/tranhuuluong/kmpgithubclient/compose_preview/PreviewUserListScreen.kt
+ */
 @Composable
 internal fun UserRoute(
     onUserClick: (UserUiModel) -> Unit,

@@ -25,6 +25,12 @@ import kmpgithubclient.composeapp.generated.resources.retry
 import kmpgithubclient.composeapp.generated.resources.some_thing_went_wrong
 import org.jetbrains.compose.resources.stringResource
 
+/**
+ * Displays an error message with a retry button.
+ *
+ * @param onRetry callback invoked when the retry button is clicked.
+ * @param modifier Modifier to apply to the layout.
+ */
 @Composable
 fun ErrorView(
     onRetry: () -> Unit,

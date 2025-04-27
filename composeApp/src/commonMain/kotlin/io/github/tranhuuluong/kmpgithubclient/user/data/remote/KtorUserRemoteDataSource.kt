@@ -8,10 +8,20 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 
+/**
+ * Remote data source implementation using Ktor for fetching user data from GitHub.
+ */
 class KtorUserRemoteDataSource(
     private val httpClient: HttpClient
 ) : UserRemoteDataSource {
 
+    /**
+     * Fetches a list of users from the GitHub API.
+     *
+     * @param since The starting user ID for pagination.
+     * @param perPage The number of users to fetch per page.
+     * @return A [DataState] containing a list of [UserDto] or an error.
+     */
     override suspend fun getUsers(since: Int, perPage: Int): DataState<List<UserDto>> {
         return safeCall<List<UserDto>> {
             httpClient.get(USERS_BASE_URL) {
@@ -21,6 +31,12 @@ class KtorUserRemoteDataSource(
         }
     }
 
+    /**
+     * Fetches detailed information for a specific user from the GitHub API.
+     *
+     * @param githubId The GitHub user ID.
+     * @return A [DataState] containing [UserDetailDto] or an error.
+     */
     override suspend fun getUserDetail(githubId: String): DataState<UserDetailDto> {
         return safeCall<UserDetailDto> {
             httpClient.get("$USERS_BASE_URL/$githubId")

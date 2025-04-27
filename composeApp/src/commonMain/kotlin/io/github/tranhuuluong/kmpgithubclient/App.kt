@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import io.github.tranhuuluong.kmpgithubclient.design_system.component.GhcAppBar
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.navigation.Route
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_detail.UserDetailRoute
+import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_detail.navigateToUserDetail
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_list.UserRoute
 import kmpgithubclient.composeapp.generated.resources.Res
 import kmpgithubclient.composeapp.generated.resources.default_app_bar_title
@@ -66,7 +67,7 @@ fun App() {
                         composable<Route.UserListing> {
                             UserRoute(
                                 onUserClick = { user ->
-                                    navController.navigate(Route.UserDetail(id = user.id))
+                                    navController.navigateToUserDetail(user.id)
                                 }
                             )
                         }
