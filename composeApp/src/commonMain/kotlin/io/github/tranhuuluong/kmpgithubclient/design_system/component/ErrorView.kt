@@ -57,7 +57,6 @@ fun ErrorView(
         Text(
             text = stringResource(Res.string.error_no_internet),
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
         )
 
