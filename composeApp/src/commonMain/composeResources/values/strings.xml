@@ -1,4 +1,5 @@
 <resources>
+    <string name="default_app_bar_title">Ghc App Bar</string>
     <string name="user_list_title">Github Users</string>
     <string name="user_detail_title">User Detail</string>
     <string name="location">Location</string>

@@ -11,6 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -20,6 +23,12 @@ import io.github.tranhuuluong.kmpgithubclient.design_system.component.GhcAppBar
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.navigation.Route
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_detail.UserDetailRoute
 import io.github.tranhuuluong.kmpgithubclient.user.presentation.user_list.UserRoute
+import kmpgithubclient.composeapp.generated.resources.Res
+import kmpgithubclient.composeapp.generated.resources.default_app_bar_title
+import kmpgithubclient.composeapp.generated.resources.user_detail_title
+import kmpgithubclient.composeapp.generated.resources.user_list_title
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,9 +48,10 @@ fun App() {
                     .nestedScroll(appBarScrollBehavior.nestedScrollConnection),
                 topBar = {
                     GhcAppBar(
-                        navBackStackEntry = currentBackStackEntry,
+                        title = stringResource(currentBackStackEntry.getTopBarTitle()),
+                        showNavigationIcon = navController.canNavigateUp(),
                         scrollBehavior = appBarScrollBehavior,
-                        onBackButtonClick = { navController.navigateUp() },
+                        onNavigationClick = { navController.navigateUp() },
                     )
                 }
             ) {
@@ -69,4 +79,25 @@ fun App() {
             }
         }
     }
+}
+
+/**
+ * Returns the top bar title based on the current navigation destination.
+ */
+private fun NavBackStackEntry?.getTopBarTitle(): StringResource {
+    val destination = this?.destination
+    return when {
+        destination == null -> Res.string.default_app_bar_title
+        destination.hasRoute<Route.UserListing>() -> Res.string.user_list_title
+        destination.hasRoute<Route.UserDetail>() -> Res.string.user_detail_title
+        else -> Res.string.default_app_bar_title
+    }
+}
+
+/**
+ * Can navigate up if there is a previous back stack entry.
+ * (Good enough for simple graphs; nested graphs may need smarter handling.)
+ */
+private fun NavController.canNavigateUp(): Boolean {
+    return previousBackStackEntry != null
 }

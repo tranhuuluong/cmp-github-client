@@ -12,30 +12,24 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDestination.Companion.hasRoute
-import io.github.tranhuuluong.kmpgithubclient.user.presentation.navigation.Route
-import kmpgithubclient.composeapp.generated.resources.Res
-import kmpgithubclient.composeapp.generated.resources.user_detail_title
-import kmpgithubclient.composeapp.generated.resources.user_list_title
-import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun GhcAppBar(
-    navBackStackEntry: NavBackStackEntry?,
-    onBackButtonClick: () -> Unit,
+    title: String,
+    showNavigationIcon: Boolean,
+    onNavigationClick: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     modifier: Modifier = Modifier,
 ) {
     MediumTopAppBar(
         modifier = modifier,
         title = {
-            Text(text = navBackStackEntry.getTopBarTitle())
+            Text(text = title)
         },
         navigationIcon = {
-            if (navBackStackEntry?.destination?.hasRoute<Route.UserListing>() != true) {
-                IconButton(onClick = onBackButtonClick) {
+            if (showNavigationIcon) {
+                IconButton(onClick = onNavigationClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,
                         contentDescription = null,
@@ -49,15 +43,4 @@ internal fun GhcAppBar(
         ),
         scrollBehavior = scrollBehavior
     )
-}
-
-@Composable
-private fun NavBackStackEntry?.getTopBarTitle(): String {
-    val destination = this?.destination
-    return when {
-        destination == null -> ""
-        destination.hasRoute<Route.UserListing>() -> stringResource(Res.string.user_list_title)
-        destination.hasRoute<Route.UserDetail>() -> stringResource(Res.string.user_detail_title)
-        else -> ""
-    }
 }
