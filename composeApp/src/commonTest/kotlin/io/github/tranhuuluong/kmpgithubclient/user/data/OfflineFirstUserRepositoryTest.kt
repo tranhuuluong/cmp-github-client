@@ -146,4 +146,27 @@ class OfflineFirstUserRepositoryTest {
         }
     }
 
+    @Test
+    fun `loadMoreUsers success - users are fetched and inserted`() = runTest {
+        userRemoteDataSource.shouldReturnError = false
+
+        userDao.getAllUsers().test {
+            assertEquals(emptyList(), awaitItem())
+            val result = repository.loadMoreUsers()
+            assertTrue(result is DataStateSuccess)
+            val users = awaitItem()
+            assertEquals(2, users.size)
+            assertEquals("john_doe_0", users[0].githubId)
+            assertEquals("john_doe_1", users[1].githubId)
+        }
+    }
+
+    @Test
+    fun `loadMoreUsers failure - error is returned`() = runTest {
+        userRemoteDataSource.shouldReturnError = true
+
+        val result = repository.loadMoreUsers()
+
+        assertTrue(result is DataStateError)
+    }
 }
