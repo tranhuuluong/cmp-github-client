@@ -15,8 +15,8 @@ class KtorUserRemoteDataSource(
     override suspend fun getUsers(since: Int, perPage: Int): DataState<List<UserDto>> {
         return safeCall<List<UserDto>> {
             httpClient.get(USERS_BASE_URL) {
-                parameter("since", since)
-                parameter("per_page", perPage)
+                parameter(Params.SINCE, since)
+                parameter(Params.PER_PAGE, perPage)
             }
         }
     }
@@ -25,6 +25,11 @@ class KtorUserRemoteDataSource(
         return safeCall<UserDetailDto> {
             httpClient.get("$USERS_BASE_URL/$githubId")
         }
+    }
+
+    private object Params {
+        const val SINCE = "since"
+        const val PER_PAGE = "per_page"
     }
 
     companion object {
