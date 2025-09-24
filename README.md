@@ -1,4 +1,4 @@
-# KMPGithubClient – Compose Multiplatform GitHub User Explorer
+# Compose Multiplatform GitHub User Explorer
 
 **KMPGithubClient** is a **Compose Multiplatform** mobile app for **Android** and **iOS** that allows users to browse and view profiles of **GitHub users**. It demonstrates modern **Kotlin Multiplatform** practices, including **clean architecture**, **reactive programming**, and an **offline-first** approach.
 
